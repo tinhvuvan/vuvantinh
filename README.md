@@ -4,20 +4,20 @@ HD viết file
 
 1. Viết tiêu đề:
 
-`# 1.Tiêu đề cấp 1`
-`###### 6.Tiêu đề cấp 6`
+    - # 1.Tiêu đề cấp 1
+    - ###### 6.Tiêu đề cấp 6
 
 2. Chèn thông tin
-`- Chèn link: [Github](https://github.com)`
-`- Chèn ảnh: <img src="link_anh_cua_ban"> (up ảnh lên http://i.imgur.com/, sau đó lấy link ảnh)`
+    - Chèn link: [Github](https://github.com)
+    - Chèn ảnh: <img src="link_anh_cua_ban"> (up ảnh lên http://i.imgur.com/, sau đó lấy link ảnh)
 
 3. Kiểu chữ
-`- In đậm: **từ cần in đậm**`
-`- Chữ nghiêng: *từ cần in nghiêng*`
+    - In đậm: **từ cần in đậm**
+    - Chữ nghiêng: *từ cần in nghiêng*
 
 4. Trích dẫn, bo chữ:
-\- `đoạn cần bo`
-- Bo nhiều dòng:
+    - `đoạn cần bo`
+    - Bo nhiều dòng:
 \```sh
 auto eth0
 iface eth0 inet static
