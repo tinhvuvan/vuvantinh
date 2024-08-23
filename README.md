@@ -35,8 +35,10 @@ HD viết file
 [Github](https://github.com)
 
 ```
-- Chèn ảnh: <img src="link_anh_cua_ban"> (up ảnh lên http://i.imgur.com/, sau đó lấy link ảnh)
+- Chèn ảnh online: <img src="link_anh_cua_ban"> (up ảnh lên http://i.imgur.com/, sau đó lấy link ảnh)
 ```
+
+- Chèn ảnh offline: upload ảnh lên trên repo của github và điền link từ repo vào. Ví dụ `![nifi1](../imgs/nifi1.png)`
 
 <a name="kieuchu"></a>
 ### 3. Kiểu chữ 
