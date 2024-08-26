@@ -1,0 +1,10 @@
+{
+        "live-restore": true,
+        "insecure-registries": ["10.240.201.50:8890", "10.240.201.50:8891", "10.60.129.132:8890", "10.60.129.132:8891"],
+        "log-driver": "local",
+        "log-opts": {
+            "max-size": "256m",
+            "max-file": "20",
+            "compress": "true"
+        }
+}

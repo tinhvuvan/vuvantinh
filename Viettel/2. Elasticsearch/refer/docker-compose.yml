@@ -1,0 +1,144 @@
+version: '2.2'
+services:
+  es01:
+    build: ./
+    container_name: es01
+    hostname: es-node-10254139177-01
+    restart: always
+    mem_limit: 64g
+    cpus: 24
+    oom_kill_disable: true
+    environment:
+      - node.name=es-node-10254139177-01
+      - cluster.name=es-docker-cluster
+      - network.publish_host=10.254.139.177
+      - discovery.seed_hosts=10.254.139.167:9300,10.254.139.167:9400,10.254.139.167:9500,10.254.139.167:9600,10.254.139.168:9300,10.254.139.168:9400,10.254.139.168:9500,10.254.139.168:9600,10.254.139.169:9300,10.254.139.169:9400,10.254.139.169:9500,10.254.139.169:9600,10.254.139.170:9300,10.254.139.170:9400,10.254.139.170:9500,10.254.139.170:9600,10.254.139.171:9300,10.254.139.171:9400,10.254.139.171:9500,10.254.139.171:9600,10.254.139.172:9300,10.254.139.172:9400,10.254.139.172:9500,10.254.139.172:9600,10.254.139.173:9300,10.254.139.173:9400,10.254.139.173:9500,10.254.139.173:9600,10.254.139.174:9300,10.254.139.174:9400,10.254.139.174:9500,10.254.139.174:9600,10.254.139.175:9300,10.254.139.175:9400,10.254.139.175:9500,10.254.139.175:9600,10.254.139.176:9300,10.254.139.176:9400,10.254.139.177:9300,10.254.139.177:9400,10.254.139.178:9300,10.254.139.178:9400,10.254.139.179:9300,10.254.139.179:9400,10.254.139.180:9300,10.254.139.180:9400,10.254.139.181:9300,10.254.139.182:9300
+      - cluster.initial_master_nodes=es-node-10254139167-01,es-node-10254139168-01,es-node-10254139169-01,es-node-10254139170-01,es-node-10254139171-01,es-node-10254139172-01,es-node-10254139173-01,es-node-10254139174-01,es-node-10254139175-01,es-node-10254139176-01,es-node-10254139177-01,es-node-10254139178-01,es-node-10254139179-01,es-node-10254139180-01,es-node-10254139181-01,es-node-10254139182-01
+      - cluster.max_shards_per_node=560
+      - transport.publish_port=9300
+      - http.port=9200
+      - node.roles=data,master,ingest
+      - node.attr.data=hot
+      - node.attr.zone=zone_177
+      - cluster.routing.allocation.awareness.attributes=zone
+      - cluster.routing.allocation.awareness.force.zone.values=zone_176,zone_177,zone_178,zone_179,zone_180,zone_181,zone_182
+      - bootstrap.memory_lock=true
+      - action.destructive_requires_name=true
+      - indices.recovery.max_bytes_per_sec=500mb
+      - indices.breaker.total.use_real_memory=true
+      - path.logs=/usr/share/elasticsearch/log
+      - path.repo=/usr/share/elasticsearch/backup
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.http.ssl.key=$CERTS_DIR/es-node-10254139177-01/es-node-10254139177-01.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es-node-10254139177-01/es-node-10254139177-01.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es-node-10254139177-01/es-node-10254139177-01.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es-node-10254139177-01/es-node-10254139177-01.key
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /u05/logtt/elasticsearch/backup:/usr/share/elasticsearch/backup
+      - es01_data:/usr/share/elasticsearch/data
+      - es01_log:/usr/share/elasticsearch/log
+      - ./log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+      - ./jvm.options:/usr/share/elasticsearch/config/jvm.options
+      - ./cert:$CERTS_DIR
+    ports:
+      - 9200:9200
+      - 9300:9300
+  es02:
+    build: ./
+    container_name: es02
+    hostname: es-node-10254139177-02
+    restart: always
+    mem_limit: 64g
+    cpus: 24
+    oom_kill_disable: true
+    environment:
+      - node.name=es-node-10254139177-02
+      - cluster.name=es-docker-cluster
+      - network.publish_host=10.254.139.177
+      - discovery.seed_hosts=10.254.139.167:9300,10.254.139.167:9400,10.254.139.167:9500,10.254.139.167:9600,10.254.139.168:9300,10.254.139.168:9400,10.254.139.168:9500,10.254.139.168:9600,10.254.139.169:9300,10.254.139.169:9400,10.254.139.169:9500,10.254.139.169:9600,10.254.139.170:9300,10.254.139.170:9400,10.254.139.170:9500,10.254.139.170:9600,10.254.139.171:9300,10.254.139.171:9400,10.254.139.171:9500,10.254.139.171:9600,10.254.139.172:9300,10.254.139.172:9400,10.254.139.172:9500,10.254.139.172:9600,10.254.139.173:9300,10.254.139.173:9400,10.254.139.173:9500,10.254.139.173:9600,10.254.139.174:9300,10.254.139.174:9400,10.254.139.174:9500,10.254.139.174:9600,10.254.139.175:9300,10.254.139.175:9400,10.254.139.175:9500,10.254.139.175:9600,10.254.139.176:9300,10.254.139.176:9400,10.254.139.177:9300,10.254.139.177:9400,10.254.139.178:9300,10.254.139.178:9400,10.254.139.179:9300,10.254.139.179:9400,10.254.139.180:9300,10.254.139.180:9400,10.254.139.181:9300,10.254.139.182:9300
+      - cluster.initial_master_nodes=es-node-10254139167-01,es-node-10254139168-01,es-node-10254139169-01,es-node-10254139170-01,es-node-10254139171-01,es-node-10254139172-01,es-node-10254139173-01,es-node-10254139174-01,es-node-10254139175-01,es-node-10254139176-01,es-node-10254139177-01,es-node-10254139178-01,es-node-10254139179-01,es-node-10254139180-01,es-node-10254139181-01,es-node-10254139182-01
+      - cluster.max_shards_per_node=560
+      - transport.publish_port=9400
+      - transport.port=9400
+      - http.port=9201
+      - node.roles=data,ingest
+      - node.attr.data=hot
+      - node.attr.zone=zone_177
+      - cluster.routing.allocation.awareness.attributes=zone
+      - cluster.routing.allocation.awareness.force.zone.values=zone_176,zone_177,zone_178,zone_179,zone_180,zone_181,zone_182
+      - bootstrap.memory_lock=true
+      - action.destructive_requires_name=true
+      - indices.recovery.max_bytes_per_sec=500mb
+      - indices.breaker.total.use_real_memory=true
+      - path.logs=/usr/share/elasticsearch/log
+      - path.repo=/usr/share/elasticsearch/backup
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.http.ssl.key=$CERTS_DIR/es-node-10254139177-02/es-node-10254139177-02.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es-node-10254139177-02/es-node-10254139177-02.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es-node-10254139177-02/es-node-10254139177-02.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es-node-10254139177-02/es-node-10254139177-02.key
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /u05/logtt/elasticsearch/backup:/usr/share/elasticsearch/backup
+      - es02_data:/usr/share/elasticsearch/data
+      - es02_log:/usr/share/elasticsearch/log
+      - ./log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+      - ./jvm.options:/usr/share/elasticsearch/config/jvm.options
+      - ./cert:$CERTS_DIR
+    ports:
+      - 9201:9201
+      - 9400:9400
+volumes:
+  es01_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u01/logtt/elasticsearch/data
+      o: bind
+  es01_log:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u01/logtt/elasticsearch/log
+      o: bind
+  es02_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u02/logtt/elasticsearch/data
+      o: bind
+  es02_log:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u02/logtt/elasticsearch/log
+      o: bind

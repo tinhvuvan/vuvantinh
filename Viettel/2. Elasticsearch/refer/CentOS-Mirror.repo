@@ -1,0 +1,43 @@
+[base]
+name=VTnetCentralRepo-CentOS-$releasever - Base
+baseurl=http://10.60.129.132/repository/Centos_Mirror/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+#released updates 
+[updates]
+name=VTnetCentralRepo-CentOS-$releasever - Updates
+baseurl=http://10.60.129.132/repository/Centos_Mirror/centos/$releasever/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+#additional packages that may be useful
+[extras]
+name=VTnetCentralRepo-CentOS-$releasever - Extras
+baseurl=http://10.60.129.132/repository/Centos_Mirror/centos/$releasever/extras/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=1
+
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=VTnetCentralRepo-CentOS-$releasever - Plus
+baseurl=http://10.60.129.132/repository/Centos_Mirror/centos/$releasever/centosplus/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=0
+
+name=VTnetCentralRepo-CentOS-$releasever - Plus
+baseurl=http://10.60.129.132/repository/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-$releasever
+enabled=0
+
+[docker]
+name=Docker
+baseurl=http://10.60.129.132/repository/docker-ce-stable/
+gpgcheck=0
+enabled=1
+

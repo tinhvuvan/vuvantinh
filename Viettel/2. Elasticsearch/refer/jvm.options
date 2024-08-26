@@ -1,0 +1,45 @@
+## IMPORTANT: JVM heap size
+-Xms32g
+-Xmx32g
+
+## GC configuration
+10-13:-XX:+UseConcMarkSweepGC
+8-13:-XX:CMSInitiatingOccupancyFraction=75
+10-13:-XX:+UseCMSInitiatingOccupancyOnly
+
+## G1GC Configuration
+14-:-XX:+UseG1GC
+14-:-XX:InitiatingHeapOccupancyPercent=70
+-XX:+PerfDisableSharedMem
+-XX:+ParallelRefProcEnabled
+-XX:G1HeapRegionSize=16m
+-XX:MaxGCPauseMillis=250
+-XX:+UseLargePages
+8:-XX:+AggressiveOpts
+-verbose:gc
+
+## JVM temporary directory
+-Djava.io.tmpdir=${ES_TMPDIR}
+
+## heap dumps
+
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/usr/share/elasticsearch/log/
+
+# specify an alternative path for JVM fatal error logs
+-XX:ErrorFile=/usr/share/elasticsearch/log/
+
+## JDK 8 GC logging
+8:-XX:+PrintGCDetails
+8:-XX:+PrintGCDateStamps
+8:-XX:+PrintTenuringDistribution
+8:-XX:+PrintGCApplicationStoppedTime
+8:-Xloggc:${loggc}
+8:-XX:+UseGCLogFileRotation
+8:-XX:NumberOfGCLogFiles=10
+8:-XX:GCLogFileSize=10m
+8:-XX:+PrintAdaptiveSizePolicy
+8:-XX:+PrintReferenceGC
+
+## GC logging
+-Xlog:gc*,gc+age=trace,safepoint:file=${loggc}:utctime,pid,tags:filecount=10,filesize=10m
