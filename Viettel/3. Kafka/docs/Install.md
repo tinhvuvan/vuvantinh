@@ -1,5 +1,6 @@
-# HƯỚNG DẪN CÀI ĐẶT ELASTICSEARCH DẠNG CONTAINER DOCKER
+# HƯỚNG DẪN CÀI ĐẶT KAFKA DẠNG CONTAINER DOCKER
 
+Lưu ý: Apache Kafka và Apache ZooKeeper thường được triển khai cùng nhau vì ZooKeeper đóng vai trò quan trọng trong việc quản lý và duy trì trạng thái của một cluster Kafka. ZooKeeper đóng vai trò quan trọng trong việc duy trì trạng thái, quản lý metadata, phân phối và bầu chọn leader cho các partition, cũng như quản lý cấu hình và khả năng mở rộng của Kafka.
 
 ## Mục lục
 
@@ -46,8 +47,11 @@ root hard nofile 65536
     
 `sysctl -w vm.max_map_count=262144`
 
+Nếu đã tạo user ứng dụng ở bước cài đặt Elasticsearch thì có thể bỏ qua bước [1.2](#1.2) và bước [1.3](#1.3)
+
 <a name="1.2"></a>
 ### 1.2. Tạo user ứng dụng (Cần quyền root)
+
 
 Chạy lệnh sau để tạo user ứng dụng:
 
@@ -69,28 +73,21 @@ Nhập mật khẩu cho user logtt
 - Copy file ![limits.conf](../refer/limits.conf) vào thư mục `/etc/security`, file ![sysctl.conf](../refer/sysctl.conf) vào thư mục `/etc/` trên server định cài, sau đó nhớ reboot server. File `limits.conf` chứa thông tin về `nproc` và `nofile` của user, file `sysctl.conf` chứa thông tin về `vm.max_map_count` và `net.ipv4.ip_forward=0` để giao tiếp giữa container thuộc 2 host khác nhau.
 
 <a name="2"></a>
-## 2. Cài đặt Elasticsearch
+## 2. Cài đặt Kafka, Zookeeper
 
 <a name="2.1"></a>
-### 2.1. Cài đặt Java (Cần quyền root)
+### 2.1. Chỉnh sửa repo (Optional) 
 
-Tuỳ thuộc vào phiên bản của Elasticsearch muốn cài để xác định phiên bản của Java 
-
-Tham khảo tài liệu sau để xác định phiên bản Java tương ứng với ES cần cài: [Installation](https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/installation.html)
-
-- Download file package của Java vào trong server hoặc download trực tiếp từ trang chủ Oracle. Câu lệnh dưới hướng dẫn cài đặt khi đã đưa file package vào trong máy chủ Centos:
-
-    yum install –y jdk-17.0.9_linux-x64_bin.rpm
-
-<a name="2.2"></a>
-### 2.2. Chỉnh sửa repo (Optional) 
+*Nếu đã thực hiện bước này khi cài đặt Elasticsearch thì có thể bỏ qua!*
 
 Đối với các máy chủ bị chặn kết nối internet, cần phải cấu hình để tải được các package thông qua repository tập trung
 
 Có thể tham khảo file cấu hình ![CentOS-Mirror.repo](../refer/CentOS-Mirror.repo). Đưa  file `CentOS-Mirror.repo` vào đường dẫn `/etc/yum.repos.d/` trên máy chủ.
 
-<a name="2.3"></a>
-### 2.3. Cài docker-ce và docker compose (Cần quyền root)
+<a name="2.2"></a>
+### 2.2. Cài docker-ce và docker compose (Cần quyền root)
+
+*Nếu đã thực hiện bước này khi cài đặt Elasticsearch thì có thể bỏ qua!*
 
 Cài docker:
 
@@ -107,8 +104,10 @@ Kiểm tra phiên bản sau khi cài:
 
 ![es1.png](../imgs/es1.png) 
 
-<a name="2.4"></a>
-### 2.4. Chỉnh sửa daemon.json (Optional) (Cần quyền root)
+<a name="2.3"></a>
+### 2.3. Chỉnh sửa daemon.json (Optional) (Cần quyền root)
+
+*Nếu đã thực hiện bước này khi cài đặt Elasticsearch thì có thể bỏ qua!*
 
 Mục đích của chỉnh sửa `daemon.json` trong thư mục `/etc/docker/daemon.json` là để trỏ repo ra dockerhub khi chúng ta cần pull/push image xuống/lên docker hub.
 
@@ -130,74 +129,123 @@ Chỉnh sửa file `/etc/docker/daemon.json` trên server đã cài docker theo 
 Tham khảo file đính kèm: 
 ![daemon.json](../refer/daemon.json)
 
-<a name="2.5"></a>
-### 2.5. Tạo thư mục để cài đặt và lưu trữ dữ liệu Elasticsearch (ES) (Cần quyền root)
+<a name="2.4"></a>
+### 2.4. Tạo file docker-compose và Dockerfile
 
-Với mỗi server sẽ có số lượng phân vùng khác nhau, tiêu chí phân chia phân vùng là:
+File `docker-compose.yml` là file chính dùng cài đặt và cấu hình ứng dụng. 
 
-- Mỗi node es ở một phân vùng
-- Các node còn lại (kafka, kafka-connect, kibana) vào 1 phân vùng 
+File `Dockerfile` là file dùng để khởi tạo image ban đầu bằng cách tải image từ Dockerhub về và chỉnh sửa một số quyền cơ bản cho user
 
-Các file `docker-compose.yml`, `Dockerfile` sẽ được lưu trên phân vùng `/u01`
+Đối với Kafka và Zookeeper, ta có thể tham khảo cấu hình mẫu bên dưới. Có thể thay đổi linh hoạt tuỳ theo mục đích và tài nguyên của máy chủ.
 
-Tạo phân vùng chứa file các `docker-compose.yml` và `Dockerfile` cài các ứng dụng Elasticsearch, Kafka, Kafka-Connect, Kibana
+Kafka và Zookeeper sẽ sử dụng chung một file `docker-compose.yml` để 2 container có thể giao tiếp và đồng nhất thông tin:
 
-`mkdir -p /u01/logtt/docker-compose`
-
-Tạo các phân vùng chứa data và log của các node (Ví dụ cho node 4 phân vùng của 4 node ES)
+- Tạo file `docker-compose.yml`:
 
 ```
-mkdir -p /u01/logtt/elasticsearch/data && mkdir -p /u01/logtt/elasticsearch/log
-mkdir -p /u02/logtt/elasticsearch/data && mkdir -p /u02/logtt/elasticsearch/log
-mkdir -p /u03/logtt/elasticsearch/data && mkdir -p /u03/logtt/elasticsearch/log
-mkdir -p /u04/logtt/elasticsearch/data && mkdir -p /u04/logtt/elasticsearch/log
+mkdir -p /u01/logtt/docker-compose/kafka-zookeeper
+vi /u01/logtt/docker-compose/kafka-zookeeper/docker-compose.yml
 ```
 
-Các thư mục được tạo (log và data) phụ thuộc vào file  ![docker-compose.yml](../refer/docker-compose.yml). Chú ý đọc file này để tạo các thư mục đúng.
-
-<a name="2.6"></a>
-### 2.6. Thay đổi homedir của user `logtt` (Cần quyền root)
-
-Mục đích để thay đổi thư mục homedir mặc định của user logtt từ `/home/logtt` sang phân mục tạo ở mục [2.5](#2.5). 
-
-Khi truy cập vào user ứng dụng, mặc định ta vào thư mục chứa các file cấu hình và log của Elasticsearch
-
-Thực hiện:
-
-- Copy các file bash trong `homedir` hiện tại của user `logtt` sang thư mục mới:
-
-`cd /home/logtt && cp .bash_logout /u01/logtt && cp .bash_profile /u01/logtt && cp .bashrc /u01/logtt`
-
-- Phân quyền cho thư mục và các file trong thư mục:
-
-`chown  -R logtt:logtt /u01/logtt/ && chmod  -R  777 /u01/ && chown  -R logtt:logtt /u02/logtt/ && chmod  -R  777 /u02/ &&  chown  -R logtt:logtt /u03/logtt/ && chmod  -R  777 /u03/ &&  chown  -R logtt:logtt /u04/logtt/ && chmod  -R  777 /u04/`
-
-- Chuyển home dir user `logtt` sang `/u01/logtt`
-
-`usermod –d /u01/logtt logtt`
-
-**Từ sau bước này dùng user `logtt`, trước mỗi lệnh thêm từ `sudo` vào**
-
-<a name="2.7"></a>
-### 2.7. Tạo file docker-compose và Dockerfile
-
-File docker-compose là file chính dùng cài đặt và cấu hình ứng dụng. 
-
-File Dockerfile là file dùng để khởi tạo image ban đầu bằng cách tải image từ Dockerhub về và chỉnh sửa một số quyền cơ bản cho user
-
-Đối với Elasticsearch, ta có thể tham khảo cấu hình mẫu bên dưới. Có thể thay đổi linh hoạt tuỳ theo mục đích và tài nguyên của máy chủ.
+Tham khảo file bên dưới:
 
 ![docker-compose.yml](../refer/docker-compose.yml)
 
-![Dockerfile](../refer/Dockerfile)
+- Tạo file Dockerfile của Kafka:  
 
-Ngoài ra, trong thư mục chứa Dockerfile và docker-compose.yml cần một số file để cấu hình tham số ban đầu cho ứng dụng bao gồm:
+```
+mkdir -p /u01/logtt/docker-compose/kafka-zookeeper/kafka 
+vi /u01/logtt/docker-compose/kafka-zookeeper/kafka/Dockerfile
+```
 
-- ![.env](../refer/.env): Cấu hình tài khoản ban đầu của ứng dụng ES 
+Tham khảo file sau: 
+![Dockerfile](../refer/Dockerfile_kafka)
 
-- ![jvm.options](../refer/jvm.options): Cấu hình các tham số jvm heap 
+- Tạo file Dockerfile của zookeeper:  
 
-- ![log4j.properties](../refer/log4j.properties): Cấu hình log của ES 
+```
+mkdir -p /u01/logtt/docker-compose/kafka-zookeeper/zookeeper 
+vi /u01/logtt/docker-compose/kafka-zookeeper/zookeeper/Dockerfile
+```
+
+Tham khảo file sau: 
+![Dockerfile](../refer/Dockerfile_zk)
+
+<a name="2.5"></a>
+### 2.5. Tạo thư mục để mount các thư mục trong docker-compose (Cần quyền root)
+
+Các thư mục được tạo (log và data) phụ thuộc vào file  ![docker-compose.yml](../refer/docker-compose.yml). Chú ý đọc file này để tạo các thư mục đúng.
+
+#### Kafka
+
+```
+mkdir /u03/logtt/kafka 
+mkdir /u03/logtt/kafka/log 
+mkdir /u03/logtt/kafka/data 
+mkdir /u03/logtt/kafka/secrets
+```
+
+#### Zookeeper
+
+```
+mkdir /u03/logtt/zookeeper 
+mkdir /u03/logtt/zookeeper/log 
+mkdir /u03/logtt/zookeeper/data 
+mkdir /u03/logtt/zookeeper/secrets
+```
+
+Phân quyền user logtt cho các thư mục vừa tạo
+
+```
+chown –R logtt:logtt /u01/logtt/docker-compose/*
+chown –R logtt:logtt /u03/logtt/*
+```
+
+<a name="2.6"></a>
+### 2.6. Bổ sung các file cấu hình của Kafka (Cần quyền root)
+
+Trong thư mục chứa Dockerfile cần một số file để cấu hình tham số ban đầu cho ứng dụng:
+
+Trong đường dẫn `/u01/logtt/docker-compose/kafka-zookeeper/kafka` bổ sung các file sau:
+
+- ![jmx_prometheus_javaagent-0.20.0.jar](../refer/jmx_prometheus_javaagent-0.20.0.jar): Driver hỗ trợ expose metric của Kafka
+
+- ![kafka-2_0_0.yml](../refer/kafka-2_0_0.yml): Cấu hình các metric cần expose của kafka
+
+- ![kafka-server-start](../refer/kafka-server-start): File cấu hình start của Kafka bổ sung bật expose metric
+
+- ![log4j.properties.template](../refer/log4j.properties.template): Cấu hình log của ES 
+
+- ![tool-log4j.properties.template](../refer/tool-log4j.properties.template): Cấu hình log của ES 
+
+Phân quyền truy cập cho các file vừa bổ sung:
+
+`chown –R logtt:logtt /u01/logtt/docker-compose/kafka-zookeeper/ *`
+
+<a name="2.6"></a>
+### 2.6. Bổ sung các file cấu hình của Zookeeper (Cần quyền root)
+
+Trong thư mục chứa Dockerfile cần một số file để cấu hình tham số ban đầu cho ứng dụng:
+
+Trong đường dẫn `/u01/logtt/docker-compose/kafka-zookeeper/zookeeper` bổ sung các file sau:
+
+- ![log4j.properties.template](../refer/log4j.properties.template): Cấu hình log của ES 
+
+- ![tool-log4j.properties.template](../refer/tool-log4j.properties.template): Cấu hình log của ES 
+
+Phân quyền truy cập cho các file vừa bổ sung:
+
+`chown –R logtt:logtt /u01/logtt/docker-compose/kafka-zookeeper/ *`
+
+
+
+
+
+
+
+
+
+
 
 <a name="3"></a>
 ## 3. Bổ sung certificate cho cluster
