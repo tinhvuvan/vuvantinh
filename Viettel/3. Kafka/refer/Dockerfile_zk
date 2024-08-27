@@ -1,0 +1,20 @@
+FROM 10.60.129.132:8890/confluentinc/cp-zookeeper:7.4.3-1-ubi8
+USER root
+#Setup time
+ENV TZ=Asia/Ho_Chi_Minh
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN useradd zookeeper
+COPY ./jmx_prometheus_javaagent-0.20.0.jar /etc/confluent/docker/
+COPY ./zookeeper.yml /etc/confluent/docker/
+COPY ./zookeeper-server-start /bin/
+#Set permission 
+RUN chmod -R 777 /var/log/kafka
+RUN chmod -R 777 /etc/kafka
+RUN chmod -R 777 /var/lib/zookeeper
+RUN chmod 777 /usr/bin/zookeeper-server-start
+RUN chmod 777 /etc/confluent/docker/jmx_prometheus_javaagent-0.20.0.jar
+RUN chmod 777 /etc/confluent/docker/zookeeper.yml
+RUN chmod 777 /var/lib/zookeeper/data/
+RUN usermod -u 1001 zookeeper
+USER zookeeper
+WORKDIR /home/zookeeper

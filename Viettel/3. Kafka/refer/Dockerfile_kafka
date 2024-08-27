@@ -1,0 +1,21 @@
+FROM 10.60.129.132:8890/confluentinc/cp-kafka:7.4.3-1-ubi8
+USER root
+
+#Setup time
+ENV TZ=Asia/Ho_Chi_Minh
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+#Setup JMX exporter
+COPY ./jmx_prometheus_javaagent-0.20.0.jar /etc/kafka/
+COPY ./kafka-2_0_0.yml /etc/confluent/docker/
+COPY ./kafka-server-start /bin/
+#Set permission 
+RUN useradd kafka
+RUN usermod -u 1001 kafka
+RUN chmod -R 777 /var/lib/kafka
+RUN chmod -R 777 /var/log/kafka
+RUN chmod -R 777 /etc/kafka/
+RUN chmod 777 /etc/kafka/jmx_prometheus_javaagent-0.20.0.jar
+RUN chmod 777 /usr/bin/kafka-server-start
+RUN chmod 777 /etc/confluent/docker/kafka-2_0_0.yml
+USER kafka
+WORKDIR /home/kafka

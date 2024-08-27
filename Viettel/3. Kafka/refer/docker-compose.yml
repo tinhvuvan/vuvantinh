@@ -1,0 +1,154 @@
+version: '2.2'
+services:
+  zookeeper:
+    build: ./zookeeper
+    restart: unless-stopped
+    hostname: zk-mq-10254139177-01
+    container_name: zk
+    restart: always
+    mem_limit: 8g
+    cpus: 4
+    oom_kill_disable: true
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+      - 9998:9998
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 10
+      ZOOKEEPER_SYNC_LIMIT: 5
+      ZOOKEEPER_SERVERS: 10.254.139.176:2888:3888;0.0.0.0:2888:3888;10.254.139.178:2888:3888;10.254.139.179:2888:3888;10.254.139.180:2888:3888;10.254.139.181:2888:3888;10.254.139.182:2888:3888
+      ZOOKEEPER_MAX_CLIENT_CNXNS: 1000
+      ZOOKEEPER_AUTOPURGE_SNAPRETAINCOUNT: 3
+      ZOOKEEPER_AUTOPURGE_PURGEINTERVAL: 1
+      ZOOKEEPER_MIN_SESSION_TIMEOUT: 30000
+      ZOOKEEPER_MAX_SESSION_TIMEOUT: 300000
+      ZOOKEEPER_SNAP_COUNT: 30000
+      ZOOKEEPER_PRE_ALLOC_SIZE: 204800
+      ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT: 1000
+      KAFKA_HEAP_OPTS: '-Xms4g -Xmx4g'
+      ZOOKEEPER_LOG4J_ROOT_LOGLEVEL: 'WARN'
+      ZOOKEEPER_TOOLS_LOG4J_LOGLEVEL: 'WARN'
+      ZOOKEEPER_LOG4J_LOGGERS: "kafka.controller=WARN,org.apache.zookeeper=INFO"
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+    volumes:
+      - zoo_data:/var/lib/zookeeper/data
+      - zoo_log:/var/lib/zookeeper/log
+      - zoo_secrets:/etc/zookeeper/secrets
+      - ./zookeeper/log4j.properties.template:/etc/confluent/docker/log4j.properties.template
+      - ./zookeeper/tools-log4j.properties.template:/etc/confluent/docker/tools-log4j.properties.template
+  kafka:
+    build: ./kafka
+    hostname: kafka-mq-10254139177-01
+    container_name: kafka
+    restart: always
+    mem_limit: 64g
+    cpus: 16
+    oom_kill_disable: true
+    environment:
+      KAFKA_LISTENERS: PLAINTEXT://:9092,SSL://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://10.254.139.177:9092,SSL://10.254.139.177:9093
+      KAFKA_SSL_KEYSTORE_FILENAME: kafka.server.keystore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: .kafka_keystore_password
+      KAFKA_SSL_KEY_CREDENTIALS: .kafka_keystore_password
+      KAFKA_SSL_TRUSTSTORE_FILENAME: kafka.server.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: .kafka_truststore_password
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+      KAFKA_SECURITY_PROTOCOL: SSL
+      KAFKA_ZOOKEEPER_CONNECT: 10.254.139.176:2181,10.254.139.177:2181,10.254.139.178:2181,10.254.139.179:2181,10.254.139.180:2181,10.254.139.181:2181,10.254.139.182:2181
+      KAFKA_LOG4J_LOGGERS: "kafka=WARN,kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3 
+      KAFKA_MESSAGE_MAX_BYTES: 5000000
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 5000000
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_BOOTSTRAP_SERVERS: 10.254.139.176:9093,10.254.139.177:9093,10.254.139.178:9093,10.254.139.179:9093,10.254.139.180:9093,10.254.139.181:9093,10.254.139.182:9093
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: 30000
+      CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KAFKA_LOG_CLEANER_ENABLE: 'true'
+      KAFKA_AUTO_LEADER_REBALANCE_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 72
+      KAFKA_LOG_SEGMENT_BYTES: 536870912
+      KAFKA_LOG_FLUSH_INTERVAL_MS: 200
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_NUM_NETWORK_THREADS: 5
+      KAFKA_NUM_REPLICA_FETCHERS: 3
+      KAFKA_QUEUED_MAX_REQUESTS: 1000
+      KAFKA_QUEUED_MAX_REQUESTS_BYTES: 5000000000
+      KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: 'false'
+      KAFKA_CONTROLLER_SOCKET_TIMEOUT_MS: 30000
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: 30000
+      KAFKA_LOG4J_ROOT_LOGLEVEL: "WARN"
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: "WARN"
+      KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g'
+      KAFKA_JVM_PERFORMANCE_OPTS: '-XX:MetaspaceSize=96m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80'
+      KAFKA_CLEANUP_POLICY: "delete"
+      KAFKA_RETENTION_BYTES: 524288000
+      KAFKA_LOG_SEGMENT_DELETE_DELAY_MS: 60000
+      KAFKA_NUM_IO_THREADS: 32
+      KAFKA_NUM_RECOVERY_THREADS_PER_DATA_DIR: 3
+      KAFKA_REPLICA_SOCKET_RECEIVE_BUFFER_BYTES: 5000000
+      KAFKA_SOCKET_SEND_BUFFER_BYTES: 5000000
+      KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 5000000
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_LOG_CLEANER_BACKOFF_MS: 15000
+      KAFKA_LOG_CLEANER_DELETE_RETENTION_MS: 86400000
+      KAFKA_LOG_CLEANER_DEDUPE_BUFFER_SIZE: 402653184
+      KAFKA_LOG_CLEANER_IO_BUFFER_LOAD_FACTOR: 0.9
+      KAFKA_LOG_CLEANER_THREADS: 8
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+      - kafka_secrets:/etc/kafka/secrets
+      - kafka_log:/var/lib/kafka/log
+      - ./kafka/log4j.properties.template:/etc/confluent/docker/log4j.properties.template
+      - ./kafka/tools-log4j.properties.template:/etc/confluent/docker/tools-log4j.properties.template
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 21111:21111
+    depends_on:
+      - zookeeper
+
+volumes:
+  zoo_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/zookeeper/data
+      o: bind
+  zoo_log:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/zookeeper/log
+      o: bind
+  zoo_secrets:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/zookeeper/secrets
+      o: bind
+  kafka_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka/data
+      o: bind
+  kafka_secrets:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka/secrets
+      o: bind
+  kafka_log:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka/log
+      o: bind
+
