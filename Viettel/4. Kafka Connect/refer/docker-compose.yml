@@ -1,0 +1,78 @@
+version: '2.2'
+services:
+  kafka-connect:
+    build: ./
+    hostname: kafka-connect-10254139177
+    container_name: kafka_connect
+    mem_limit: 32g
+    cpus: 16
+    oom_kill_disable: true
+    restart: always
+    ports:
+      - 8083:8083
+      - 21112:21112
+    environment:
+      CONNECT_LISTENERS: 'https://0.0.0.0:8083'
+#      CONNECT_BOOTSTRAP_SERVERS: 10.254.139.176:9093,10.254.139.177:9093,10.254.139.178:9093,10.254.139.179:9093,10.254.139.180:9093,10.254.139.181:9093,10.254.139.182:9093,10.254.139.176:9092,10.254.139.177:9092,10.254.139.178:9092,10.254.139.179:9092,10.254.139.180:9092,10.254.139.181:9092,10.254.139.182:9092
+      CONNECT_BOOTSTRAP_SERVERS: 10.254.139.176:9093,10.254.139.177:9093,10.254.139.178:9093,10.254.139.179:9093,10.254.139.180:9093,10.254.139.181:9093,10.254.139.182:9093      
+#      CONNECT_REST_PORT: 8083
+      CONNECT_SECURE_REST_PORT: 8083      
+      CONNECT_GROUP_ID: kakfa-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+      CONNECT_SECURITY_PROTOCOL: SSL
+      CONNECT_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.server.truststore.jks
+      CONNECT_SSL_TRUSTSTORE_PASSWORD: 123123
+      CONNECT_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.server.keystore.jks
+      CONNECT_SSL_KEYSTORE_PASSWORD: 123123
+      CONNECT_SSL_KEY_PASSWORD: 123123
+      CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      CONNECT_SSL_CLIENT_AUTH: requested
+      CONNECT_CONSUMER_SECURITY_PROTOCOL: SSL
+      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.truststore.jks
+      CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: 123123
+      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /etc/kafka-connect/secrets/kafka.connect.keystore.jks
+      CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD: 123123
+      CONNECT_CONSUMER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""      
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "10.254.139.177"
+      LOG4J_ROOT_LOGLEVEL: "WARN"
+      LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=WARN"
+      CONNECT_TOOLS_LOG4J_LOGLEVEL: "WARN"
+      LOG4J_APPENDER_FILE_LAYOUT_CONVERSIONPATTERN: "[%d] %p %X{connector.context}%m (%c:%L)%n"
+      CONNECT_SEND_BUFFER_BYTES: "3000000"
+      CONNECT_RECEIVE_BUFFER_BYTES: "1000000"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "3"
+      CONNECT_PLUGIN_PATH: '/usr/share/java,/etc/kafka-connect/jars'
+      KAFKA_HEAP_OPTS: '-Xms6g -Xmx6g'
+    volumes:
+     - data:/etc/kafka-connect/jars/
+     - secrets:/etc/kafka-connect/secrets
+     - ./log4j.properties.template:/etc/confluent/docker/log4j.properties.template
+     - ./tools-log4j.properties.template:/etc/confluent/docker/tools-log4j.properties.template
+     - log:/var/lib/kafka-connect/log
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka-connect/data
+      o: bind
+  secrets:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka-connect/secrets
+      o: bind
+  log:
+    driver: local
+    driver_opts:
+      type: none
+      device: /u03/logtt/kafka-connect/log
+      o: bind

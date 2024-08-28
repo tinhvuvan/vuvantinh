@@ -1,0 +1,26 @@
+log4j.rootLogger={{ env["CONNECT_LOG4J_ROOT_LOGLEVEL"] | default('WARN') }}, file
+
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.MaxFileSize=256MB
+log4j.appender.file.MaxBackupIndex=20
+log4j.appender.file.File=/var/lib/kafka-connect/log/kafka-connect.log
+log4j.appender.file.layout.ConversionPattern ={{ env["CONNECT_LOG4J_APPENDER_FILE_LAYOUT_CONVERSIONPATTERN"] | default('[%d] %p %m (%c)%n') }}
+
+
+{% set default_loggers = {
+        'org.reflections': 'WARN',
+        'org.apache.zookeeper': 'WARN',
+        'org.I0Itec.zkclient': 'WARN'
+} -%}
+
+{% if env['CONNECT_LOG4J_LOGGERS'] %}
+# loggers from CONNECT_LOG4J_LOGGERS env variable
+{% set loggers = parse_log4j_loggers(env['CONNECT_LOG4J_LOGGERS']) %}
+{% else %}
+# default log levels
+{% set loggers = default_loggers %}
+{% endif %}
+{% for logger,loglevel in loggers.items() %}
+log4j.logger.{{logger}}={{loglevel}}
+{% endfor %}
