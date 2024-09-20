@@ -1,0 +1,63 @@
+#cloud-config for cloud server
+autoinstall:
+  version: 1
+  # default keyboard layout, locale and timezone
+  keyboard:
+    layout: us
+  locale: en_US.UTF-8
+  timezone: Asia/Ho_Chi_Minh
+  # install ssh server
+  ssh:
+    allow-pw: true
+    authorized-keys: []
+    install-server: true
+  # default hostname, vt_admin user
+  identity:
+    realname: logtt-server
+    hostname: logtt-server
+    username: vt_admin
+    # password is 1
+    password: $6$I8Km57LbbFp01Krh$YlIykhuXYm/UiurphgWJ3CkwyDVYrQCM6jf.Siy90du32UMdMbDd629QkLYfMr3YXr1Q5WhO4dThRntcxLfMI0
+  storage:
+    grub:
+      reorder_uefi: False
+    config:
+    - {ptable: gpt, path: /dev/sda, wipe: superblock-recursive, preserve: false, name: '',
+      grub_device: true, type: disk, id: disk-sda}
+    - {ptable: gpt, path: /dev/sdb, wipe: superblock-recursive, preserve: false, name: '',
+      grub_device: false, type: disk, id: disk-sdb}
+    - {device: disk-sdb, size: 1G, wipe: superblock, flag: boot, number: 1,
+      preserve: false, grub_device: true, type: partition, id: partition-0}
+    - {fstype: fat32, volume: partition-0, preserve: false, type: format, id: format-0}
+    - {device: disk-sdb, size: 1G, wipe: superblock, flag: '', number: 2,
+      preserve: false, grub_device: false, type: partition, id: partition-1}
+    - {fstype: xfs, volume: partition-1, preserve: false, type: format, id: format-1}
+    - {device: disk-sdb, size: -1, wipe: superblock, flag: '', number: 3,
+      preserve: false, grub_device: false, type: partition, id: partition-3}
+    - name: vg-ubuntu
+      devices: [partition-3]
+      preserve: false
+      type: lvm_volgroup
+      id: lvm_volgroup-0
+    - {name: lv-ubuntu-swap, volgroup: lvm_volgroup-0, size: 32G, wipe: superblock,
+      preserve: false, type: lvm_partition, id: lvm_partition-0}
+    - {fstype: swap, volume: lvm_partition-0, preserve: false, type: format, id: format-3}
+    - {path: '', device: format-3, type: mount, id: mount-2}
+    - {name: lv-ubuntu-var, volgroup: lvm_volgroup-0, size: 50G, wipe: superblock,
+      preserve: false, type: lvm_partition, id: lvm_partition-1}
+    - {fstype: xfs, volume: lvm_partition-1, preserve: false, type: format, id: format-4}
+    - {path: /var, device: format-4, type: mount, id: mount-3}
+    - {name: lv-ubuntu-root, volgroup: lvm_volgroup-0, size: 50G, wipe: superblock,
+      preserve: false, type: lvm_partition, id: lvm_partition-2}
+    - {fstype: xfs, volume: lvm_partition-2, preserve: false, type: format, id: format-5}
+    - {path: /, device: format-5, type: mount, id: mount-4}
+    - {name: lv-ubuntu-u01, volgroup: lvm_volgroup-0, size: -1, wipe: superblock,
+      preserve: false, type: lvm_partition, id: lvm_partition-3}
+    - {fstype: xfs, volume: lvm_partition-3, preserve: false, type: format, id: format-6}
+    - {path: /u01, device: format-6, type: mount, id: mount-5}
+    - {path: /boot, device: format-1, type: mount, id: mount-1}
+    - {path: /boot/efi, device: format-0, type: mount, id: mount-0}
+    swap: {swap: 0}
+  late-commands:
+    - sudo cp -r /cdrom/postinstall/ /target/root/
+    - cd /target/root/postinstall/networkconf_ubuntu/ ; bash ubuntu_postinstall_auto_config_network.sh

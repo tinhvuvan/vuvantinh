@@ -1,0 +1,17 @@
+#hostname|serial|type|bond_interface_name|bond_subinterfaces|bond_macsubinterfaces|bond_mode|single_interface_name|single_macinterface|ip_address|prefix|gateway|vlan|defroute
+hlc6fidc2-vtn02-log-10254139167|1YQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.167|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139168|2YQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.168|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139169|3YQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.169|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139170|4YQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.170|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139171|5YQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.171|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139172|FXQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.172|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139173|GXQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.173|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139174|HXQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.174|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139175|JXQPVP3|bond|bond0|eno2np1,enp59s0f0np0|none|4|n/a|n/a|10.254.139.175|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139176|1R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.176|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139177|2R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.177|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139178|3R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.178|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139179|4R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.179|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139180|5R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.180|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139181|6R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.181|24|10.254.139.254|1339|yes
+hlc6fidc2-vtn02-log-10254139182|7R8HVQ3|bond|bond0|eno12399np0,enp177s0f0np0|none|4|n/a|n/a|10.254.139.182|24|10.254.139.254|1339|yes
